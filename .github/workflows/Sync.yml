@@ -1,0 +1,27 @@
+name: Sync Upstream Branch
+
+on:
+  workflow_dispatch:
+  # Bỏ dấu # bên dưới nếu muốn tự động đồng bộ mỗi 12 tiếng
+  # schedule:
+  #   - cron: '0 */12 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync lisa-hyperos2-android14 from upstream
+        env:
+          UPSTREAM_URL: https://github.com/khoaiprovip123/nothingsvn_xiaomi-stocktoolbuild.git
+          BRANCH: lisa-hyperos2-android14
+          TOKEN: ${{ secrets.GH_PAT || github.token }}
+        run: |
+          git init sync_repo
+          cd sync_repo
+          git remote add upstream "$UPSTREAM_URL"
+          git fetch upstream "$BRANCH"
+          git remote add origin "https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git"
+          git push origin "FETCH_HEAD:refs/heads/${BRANCH}" --force
